@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phaser Game</title>
+
+    <!-- Подключаем Phaser -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.55.2/phaser.min.js"></script>
+
+    <!-- Простые стили, чтобы убрать отступы -->
+    <style>
+        body { margin: 0; padding: 0; }
+    </style>
+</head>
+<body>
+
+    <!-- Контейнер, в котором появится игра -->
+    <div id="game_container"></div>
+
+    <!-- Подключаем наш игровой скрипт -->
+    <script src="{% static 'game.js' %}"></script>
+
+</body>
+</html>

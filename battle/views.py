@@ -19,5 +19,7 @@ def registration(request):
     return render(request, 'register.html', {'form': form})
 
 
+def game_view(request):
+    return render(request, 'index.html')
 
 
