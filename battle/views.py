@@ -20,6 +20,6 @@ def registration(request):
 
 
 def game_view(request):
-    return render(request, 'index.html')
+    return render(request, 'index.html') # Покажи файл index.html из папки templates
 
 

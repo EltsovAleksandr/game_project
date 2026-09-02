@@ -26,7 +26,7 @@ urlpatterns = [
     path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register', registration, name='register'),
-    path('', game_view, name='game'),
-    path('', home, name = 'home'),
+    path('', game_view, name='game'), # Когда пользователь заходит на главную страницу (/), покажи ему game_view, а значит — нашу игру
+    #path('', home, name = 'home'),
 
 ]
