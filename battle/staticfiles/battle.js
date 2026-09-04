@@ -14,6 +14,8 @@ function preload () {
 	this.load.image('background', 'static/images/background.jpg');
 	this.load.image('hero', 'static/images/hero.png');
 	this.load.image('enemy', 'static/images/enemy.png');
+	this.load.image('coin', 'static/images/coin.jpg');
+	this.load.image('arch', 'static/images/arch.jpg');
 }
 
 function create () {
@@ -25,6 +27,9 @@ function create () {
 //Земля
 	this.ground = this.physics.add.staticGroup();
 	this.ground.create(6000, this.game.config.height, 'ground').setSize(12000, 35).setVisible(false);
+
+//Арка
+	this.add.image(11500, game.config.height - 200, 'arch').setScale(0.08);
 
 //Игрок
 	this.player = this.physics.add.sprite(100, 500, 'hero'); //Координаты появления героя
@@ -52,7 +57,7 @@ function create () {
 // Слушает прыжок по 1 нажатию
 	this.input.keyboard.on('keyboard-SPACE', () => {
 		if (this.player.body.blocked.down) {
-			this.player.setVelocityY(-650);
+			this.player.setVelocityY(-1050);
 		}
 	})
 
@@ -63,28 +68,45 @@ function create () {
 	this.cameras.main.startFollow(this.player); // Камера автоматом за игроком
 
 
-
-// Создаём фон и текст всплывающего окна
-    this.popupBg = this.add.rectangle(400, 300, 300, 200, 0x000000, 0.8); /* Рисуем прямоугольник (фон окна) 400, 300 — координаты по центру экрана.
-																		  300, 200 — ширина и высота окна
-	  																	  0x000000 — цвет (чёрный)
-	  																	  0.8 — прозрачность (80%)*/
-    this.popupText = this.add.text(400, 250, 'ИГра окончена', {color: '#'}) // Выводим текст и выравниваем текст по центру
-
 // Создаем кнопку
-	this.btRestart = this.add.text(400, 300, 'Заново', { // Создаём кнопку «Заново»
-		backgroundColor: '#555',
+// Окно регистрация - вход
+	// Фон и текст
+	this.popupBg = this.add.rectangle(0, 0, game.config.width + 100, game.config.height, 0x000000, 0.8);
+	this.popupText = this.add.text(0, -60, 'Конец игры. Чтобы сохранить результат, войдите или зарегистрируйтесь.', {fontsize: '24px', color: '#fff'}).setOrigin(0.5);
+
+	// Кнопка Регистрация
+	this.btRegister = this.add.text( 0, 20, 'Регистрация', {fontsize: '18px', background: '#444', color: '#fff', padding: 10})
+		.setOrigin(0.5)
+		.setInteractive()
+		.on('pointdown', () => window.location.href = '/register/');
+
+	// Кнопка Вход
+	this.btLogin = this.add.text(0, 70, 'Вход', {fontsize: '18px', backgroundColor: '#444', color: '#fff', padding: 10})
+		.setOrigin(0.5)
+		.setInteractive()
+		.on('pointdown', () => {windows.location.href = '/login/'});
+
+	// Кнопка рестарт
+	this.btRestart = this.add.text(0, 120, 'Заново', {
+		fontsize: '18px',
+		backgroundColor: '#444',
 		color: '#fff'
 	})
 	.setOrigin(0.5) // Центрируем текст
 	.setInteractive() // Делаем кнопку кликабельной
 	.on('pointerdown', () => this.scene.restart()); // Что делать при клике. В данном случае — перезапустить сцену
 
+	// Объединяем в контейнер
+	 this.popup = this.add.container(this.cameras.main.ScrollX + this.scale.width / 2, game.config.height / 2, [ /*this.add.container(x, y, [элементы]) — объединяет все части окна.  [popupBg, popupText, btnRestart] — всё, что мы хотим показать вместе.*/
+		 this.popupBg,
+		 this.popupText,
+		 this.btLogin,
+		 this.btRegister,
+		 this.btRestart,
+	 ]) ;
+	 this.popup.setVisible(false) // Скрываем окно
 
-// Объединяем в контейнер
-	this.popup = this.add.container(0, 0, [this.popupBg, this.popupText, this.btRestart]); /*this.add.container(x, y, [элементы]) — объединяет все части окна.
-                                                                                           0, 0 — контейнер расположен в верхнем левом углу (координаты относительно сцены).
- 																					       [popupBg, popupText, btnRestart] — всё, что мы хотим показать вместе.*/
+
 // Создаем врага
 	this.enemies = this.physics.add.group({
 		key: 'enemy', 						  // ключ картинки, загруженной в preload()
@@ -96,7 +118,7 @@ function create () {
 
 // Умемньшаем размер врагов и задаем размер их коллайдера
 	this.enemies.children.iterate(function (enemy) {
-		enemy.setScale(0.03);
+		enemy.setScale(0.02);
 		enemy.body.setSize(4000, 3500);
 		enemy.body.setOffset(500, 1000);
 	});
@@ -105,9 +127,50 @@ function create () {
 	this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
 		player.setTint(0xff0000); // Меняем цвет игрока при столкновении
 		this.physics.pause(); // Останавливаем физику
+		this.popup.setPosition(this.cameras.main.scrollX + this.scale.width / 2, game.config.height / 2);
+		this.popup.setVisible(true)
 	});
 
-	this.popup.setVisible(false); // Скрыть кнопку
+
+
+// Создаем монеты
+	this.coinsTop = this.physics.add.group({
+		key: 'coin',
+		repeat: 13,
+		setXY: {x: 500, y: 250, stepX: 800}
+	});
+
+	this.coinsBottom = this.physics.add.group({
+		key: 'coin',
+		repeat: 8,
+		setXY: {x: 900, y: 450, stepX: 800}
+	});
+
+	this.coinsTop.children.iterate((coin) => {
+		coin.setScale(0.012);
+		coin.body.allowGravity = false;
+	});
+
+	this.coinsBottom.children.iterate((coin) => {
+		coin.setScale(0.012);
+		coin.body.allowGravity = false;
+	});
+
+
+	this.score = 0;
+	this.physics.add.collider(this.player, this.coinsTop, (player, coin) => {
+		coin.disableBody(true, true); /* Отключает физику объекта и скрывает его с экрана
+		 							     Первый true — отключает физику монетки (она больше не участвует в столкновениях).
+  										 Второй true — делает монетку невидимой (удаляет с экрана).*/
+		this.score += 1;
+		console.log(this.score);
+	});
+	this.physics.add.collider(this.player, this.coinsBottom, (player, coin) => {
+		coin.disableBody(true, true);
+		this.score += 1;
+		console.log(this.score);
+	});
+
 
 }
 
@@ -130,8 +193,8 @@ function update () {
 		this.player.setVelocityX(-160);   // движение влево
 		this.player.flipX = true;         // Поворачиваем картинку игрока влево
 	}
-	if (this.cursors.right.isDown) {
-		this.player.setVelocityX(160); // Двигаемся вправо
+	else if (this.cursors.right.isDown) {
+		this.player.setVelocityX(360); // Двигаемся вправо
 		this.player.flipX = false; // Поворачиваем картинку игрока вправо
 	} else {
 		this.player.setVelocityX(0); //Останавливаемся
@@ -139,8 +202,14 @@ function update () {
 
 	// Проверяем стоит ли игрок на чем то твердом, для возможности прыгнуть
 	if (this.cursors.space.isDown && this.player.body.blocked.down) {
-		this.player.setVelocityY(-500);
+		this.player.setVelocityY(-600);
 	}
 
+	// Финал игры
+	if (this.player.x >= 11000) {
+		this.physics.pause();
+		this.popup.setPosition(this.cameras.main.scrollX + this.scale.width / 2, game.config.height / 2);
+		this.popup.setVisible(true);
+	}
 
 }
