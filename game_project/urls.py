@@ -16,17 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from battle.views import home, registration, game_view
+from battle.views import home, registration, game_view, custom_login
 from django.contrib.auth import views as auth_views
 
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('login/', auth_views.LoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('register', registration, name='register'),
     path('', game_view, name='game'), # Когда пользователь заходит на главную страницу (/), покажи ему game_view, а значит — нашу игру
-    #path('', home, name = 'home'),
+    path('login/', custom_login, name='login'),
+    path('', home, name = 'home'),
 
 ]

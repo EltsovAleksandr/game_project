@@ -11,5 +11,15 @@
     {{ form.as_p }}
     <button type="submit">Зарегистрироваться</button>
   </form>
+  <script>
+    const score = localStorage.getItem("score");
+    if (score) {
+        // Найдём input, созданный формой Django:
+        const input = document.querySelector('input[name="score"]');
+        if (input) {
+            input.value = score;
+        }
+    }
+</script>
 </body>
 </html>

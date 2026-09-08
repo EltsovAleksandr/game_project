@@ -13,5 +13,15 @@
   </form>
 
   <a href="{% url 'logout' %}">Выйти</a>
+  <script>
+    const score = localStorage.getItem("score");
+    if (score) {
+        // Найдём input, созданный формой Django:
+        const input = document.querySelector('input[name="score"]');
+        if (input) {
+            input.value = score;
+        }
+    }
+</script>
 </body>
 </html>

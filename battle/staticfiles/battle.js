@@ -24,6 +24,7 @@ function create () {
 	const bgHeight = this.game.config.height;
 	this.background = this.add.tileSprite(0, 0, bgWidth, bgHeight, 'background').setOrigin(0, 0);
 
+
 //Земля
 	this.ground = this.physics.add.staticGroup();
 	this.ground.create(6000, this.game.config.height, 'ground').setSize(12000, 35).setVisible(false);
@@ -46,8 +47,6 @@ function create () {
 
 // Добавления Escape и Пробела
 	this.escape = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
-	this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-	this.enterKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ENTER);
 	this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
 	this.w = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 	this.s = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
@@ -68,43 +67,7 @@ function create () {
 	this.cameras.main.startFollow(this.player); // Камера автоматом за игроком
 
 
-// Создаем кнопку
-// Окно регистрация - вход
-	// Фон и текст
-	this.popupBg = this.add.rectangle(0, 0, game.config.width + 100, game.config.height, 0x000000, 0.8);
-	this.popupText = this.add.text(0, -60, 'Конец игры. Чтобы сохранить результат, войдите или зарегистрируйтесь.', {fontsize: '24px', color: '#fff'}).setOrigin(0.5);
 
-	// Кнопка Регистрация
-	this.btRegister = this.add.text( 0, 20, 'Регистрация', {fontsize: '18px', background: '#444', color: '#fff', padding: 10})
-		.setOrigin(0.5)
-		.setInteractive()
-		.on('pointdown', () => window.location.href = '/register/');
-
-	// Кнопка Вход
-	this.btLogin = this.add.text(0, 70, 'Вход', {fontsize: '18px', backgroundColor: '#444', color: '#fff', padding: 10})
-		.setOrigin(0.5)
-		.setInteractive()
-		.on('pointdown', () => {windows.location.href = '/login/'});
-
-	// Кнопка рестарт
-	this.btRestart = this.add.text(0, 120, 'Заново', {
-		fontsize: '18px',
-		backgroundColor: '#444',
-		color: '#fff'
-	})
-	.setOrigin(0.5) // Центрируем текст
-	.setInteractive() // Делаем кнопку кликабельной
-	.on('pointerdown', () => this.scene.restart()); // Что делать при клике. В данном случае — перезапустить сцену
-
-	// Объединяем в контейнер
-	 this.popup = this.add.container(this.cameras.main.ScrollX + this.scale.width / 2, game.config.height / 2, [ /*this.add.container(x, y, [элементы]) — объединяет все части окна.  [popupBg, popupText, btnRestart] — всё, что мы хотим показать вместе.*/
-		 this.popupBg,
-		 this.popupText,
-		 this.btLogin,
-		 this.btRegister,
-		 this.btRestart,
-	 ]) ;
-	 this.popup.setVisible(false) // Скрываем окно
 
 
 // Создаем врага
@@ -170,7 +133,63 @@ function create () {
 		this.score += 1;
 		console.log(this.score);
 	});
+// Создаем кнопку
+// Окно регистрация - вход
+	localStorage.setItem("score", this.score);
+	// Фон и текст
+	this.popupBg = this.add.rectangle(0, 0, game.config.width + 100, game.config.height, 0x000000, 0.8);
+	this.popupText = this.add.text(0, -60, 'Конец игры. Чтобы сохранить результат, войдите или зарегистрируйтесь.', {fontsize: '24px', color: '#fff'}).setOrigin(0.5);
 
+	// Кнопка Регистрация
+	this.btnRegister = this.add.text(0, 20, 'Регистрация', { fontSize: '18px', backgroundColor: '#444', color: '#fff', padding: { x: 10, y: 10 } })
+    .setOrigin(0.5);
+
+	// Кнопка Вход
+	this.btnLogin = this.add.text(0, 70, 'Вход', { fontSize: '18px', backgroundColor: '#444', color: '#fff'/*, padding: { x: 10, y: 10 }*/ })
+	.setOrigin(0.5);
+
+
+	// Кнопка рестарт
+	this.btnRestart = this.add.text(0, 120, 'Заново', {
+		fontsize: '18px',
+		backgroundColor: '#444',
+		color: '#fff'
+	})
+	.setOrigin(0.5); // Центрируем текст
+
+	this.input.enableDebug(this.btnRegister);
+	this.input.enableDebug(this.btnLogin);
+	this.input.enableDebug(this.btnRestart);
+	// Объединяем в контейнер
+	 this.popup = this.add.container(this.cameras.main.ScrollX + this.scale.width / 2, game.config.height / 2, [ /*this.add.container(x, y, [элементы]) — объединяет все части окна.  [popupBg, popupText, btnRestart] — всё, что мы хотим показать вместе.*/
+		 this.popupBg,
+		 this.popupText,
+		 this.btnLogin,
+		 this.btnRegister,
+		 this.btnRestart,
+	 ]) ;
+	 this.btnRegister
+		.setInteractive()
+    	.on('pointerdown', () => {
+			localStorage.setItem("score", this.score);
+			window.location.href = '/register/';});
+
+	 this.btnLogin
+		.setInteractive({ useHandCursor: true })
+   		.on('pointerdown', () => {
+		   console.log('Кнопка вход отработала');
+		   localStorage.setItem("score", this.score);
+		   window.location.href = '/login/';});
+
+	 this.btnRestart
+		.setInteractive() // Делаем кнопку кликабельной
+		.on('pointerdown', () => this.scene.restart()); // Что делать при клике. В данном случае — перезапустить сцену
+
+	this.popup.setScrollFactor(0);
+    this.popup.setPosition(this.scale.width / 2, game.config.height / 2);
+
+
+	this.popup.setVisible(false) // Скрываем окно
 
 }
 
