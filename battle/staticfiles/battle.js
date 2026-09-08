@@ -20,9 +20,15 @@ function preload () {
 
 function create () {
 // Фон на всю ширину и высоту сцены
-	const bgWidth = 12000;
+	/*const bgWidth = 12000;
 	const bgHeight = this.game.config.height;
-	this.background = this.add.tileSprite(0, 0, bgWidth, bgHeight, 'background').setOrigin(0, 0);
+	this.background = this.add.tileSprite(0, 0, bgWidth, bgHeight, 'background').setOrigin(0, 0);*/
+this.background = this.add.tileSprite(0, 0, this.scale.width, this.scale.height, 'background')
+    .setOrigin(0, 0)
+    .setScrollFactor(0);
+
+
+
 
 
 //Земля
@@ -50,15 +56,15 @@ function create () {
 	this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
 	this.w = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W);
 	this.s = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
-	this.a = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S);
+	this.a = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A);
 	this.d = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D);
 
 // Слушает прыжок по 1 нажатию
-	this.input.keyboard.on('keyboard-SPACE', () => {
+	/*this.input.keyboard.on('keyboard-SPACE', () => {
 		if (this.player.body.blocked.down) {
 			this.player.setVelocityY(-1050);
 		}
-	})
+	})*/
 
 // Настройки физики
 	this.physics.world.setBounds(0, 0, 12000, game.config.height); // Граница физического мира
@@ -90,7 +96,7 @@ function create () {
 	this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
 		player.setTint(0xff0000); // Меняем цвет игрока при столкновении
 		this.physics.pause(); // Останавливаем физику
-		this.popup.setPosition(this.cameras.main.scrollX + this.scale.width / 2, game.config.height / 2);
+		//this.popup.setPosition(this.cameras.main.scrollX + this.scale.width / 2, game.config.height / 2);
 		this.popup.setVisible(true)
 	});
 
@@ -195,7 +201,7 @@ function create () {
 
 function update () {
 	// Проверка какая клавиша нажата
-	if (this.cursors.left.isDown) {
+	/*if (this.cursors.left.isDown) {
 		console.log('Нажата стрелка ВЛЕВО');
 	}
 	if (this.cursors.right.isDown) {
@@ -206,7 +212,10 @@ function update () {
 	}
 	if (this.cursors.down.isDown) {
 		console.log('Нажата стрелка ВНИЗ');
-	}
+	}*/
+
+	// В update():
+	this.background.tilePositionX = this.cameras.main.scrollX * 0.3; // эффект параллакса
 	// Добавляем движение игрока
 	if (this.cursors.left.isDown) {
 		this.player.setVelocityX(-160);   // движение влево
@@ -227,7 +236,7 @@ function update () {
 	// Финал игры
 	if (this.player.x >= 11000) {
 		this.physics.pause();
-		this.popup.setPosition(this.cameras.main.scrollX + this.scale.width / 2, game.config.height / 2);
+		//this.popup.setPosition(this.cameras.main.scrollX + this.scale.width / 2, game.config.height / 2);
 		this.popup.setVisible(true);
 	}
 
