@@ -27,10 +27,6 @@ this.background = this.add.tileSprite(0, 0, this.scale.width, this.scale.height,
     .setOrigin(0, 0)
     .setScrollFactor(0);
 
-
-
-
-
 //Земля
 	this.ground = this.physics.add.staticGroup();
 	this.ground.create(6000, this.game.config.height, 'ground').setSize(12000, 35).setVisible(false);
@@ -73,9 +69,6 @@ this.background = this.add.tileSprite(0, 0, this.scale.width, this.scale.height,
 	this.cameras.main.startFollow(this.player); // Камера автоматом за игроком
 
 
-
-
-
 // Создаем врага
 	this.enemies = this.physics.add.group({
 		key: 'enemy', 						  // ключ картинки, загруженной в preload()
@@ -97,9 +90,8 @@ this.background = this.add.tileSprite(0, 0, this.scale.width, this.scale.height,
 		player.setTint(0xff0000); // Меняем цвет игрока при столкновении
 		this.physics.pause(); // Останавливаем физику
 		//this.popup.setPosition(this.cameras.main.scrollX + this.scale.width / 2, game.config.height / 2);
-		this.popup.setVisible(true)
+		this.setPopupVisible(true)
 	});
-
 
 
 // Создаем монеты
@@ -140,79 +132,88 @@ this.background = this.add.tileSprite(0, 0, this.scale.width, this.scale.height,
 		console.log(this.score);
 	});
 // Создаем кнопку
-// Окно регистрация - вход
-	localStorage.setItem("score", this.score);
-	// Фон и текст
-	this.popupBg = this.add.rectangle(0, 0, game.config.width + 100, game.config.height, 0x000000, 0.8);
-	this.popupText = this.add.text(0, -60, 'Конец игры. Чтобы сохранить результат, войдите или зарегистрируйтесь.', {fontsize: '24px', color: '#fff'}).setOrigin(0.5);
+// --- Замените весь блок создания popup на этот: ---
 
-	// Кнопка Регистрация
-	this.btnRegister = this.add.text(0, 20, 'Регистрация', { fontSize: '18px', backgroundColor: '#444', color: '#fff', padding: { x: 10, y: 10 } })
-    .setOrigin(0.5);
+    localStorage.setItem("score", this.score);
 
-	// Кнопка Вход
-	this.btnLogin = this.add.text(0, 70, 'Вход', { fontSize: '18px', backgroundColor: '#444', color: '#fff'/*, padding: { x: 10, y: 10 }*/ })
-	.setOrigin(0.5);
+    const centerX = this.scale.width / 2;
+    const centerY = this.scale.height / 2;
 
+    // 1. Темный фон окна
+    this.popupBg = this.add.rectangle(centerX, centerY, this.scale.width + 100, this.scale.height, 0x000000, 0.8)
+        .setOrigin(0.5, 0.5)
+        .setScrollFactor(0)
+        .setDepth(1000);
 
-	// Кнопка рестарт
-	this.btnRestart = this.add.text(0, 120, 'Заново', {
-		fontsize: '18px',
-		backgroundColor: '#444',
-		color: '#fff'
-	})
-	.setOrigin(0.5); // Центрируем текст
+    // 2. Текст сообщения
+    this.popupText = this.add.text(centerX, centerY - 70, 'Конец игры. Чтобы сохранить результат, войдите или зарегистрируйтесь.', {
+        fontSize: '20px',
+        color: '#fff',
+        align: 'center'
+    })
+    .setOrigin(0.5, 0.5)
+    .setScrollFactor(0)
+    .setDepth(1001);
 
-	this.input.enableDebug(this.btnRegister);
-	this.input.enableDebug(this.btnLogin);
-	this.input.enableDebug(this.btnRestart);
-	// Объединяем в контейнер
-	 this.popup = this.add.container(this.cameras.main.ScrollX + this.scale.width / 2, game.config.height / 2, [ /*this.add.container(x, y, [элементы]) — объединяет все части окна.  [popupBg, popupText, btnRestart] — всё, что мы хотим показать вместе.*/
-		 this.popupBg,
-		 this.popupText,
-		 this.btnLogin,
-		 this.btnRegister,
-		 this.btnRestart,
-	 ]) ;
-	 this.btnRegister
-		.setInteractive()
-    	.on('pointerdown', () => {
-			localStorage.setItem("score", this.score);
-			window.location.href = '/register/';});
+    // Вспомогательная функция для кнопок без контейнера
+    const createMenuButton = (scene, x, y, width, height, textStr, callback) => {
+        const bg = scene.add.rectangle(x, y, width, height, 0x444444)
+            .setOrigin(0.5, 0.5)
+            .setScrollFactor(0)
+            .setDepth(1001)
+            .setInteractive({ useHandCursor: true });
 
-	 this.btnLogin
-		.setInteractive({ useHandCursor: true })
-   		.on('pointerdown', () => {
-		   console.log('Кнопка вход отработала');
-		   localStorage.setItem("score", this.score);
-		   window.location.href = '/login/';});
+        const txt = scene.add.text(x, y, textStr, {
+            fontSize: '18px',
+            color: '#ffffff'
+        })
+        .setOrigin(0.5, 0.5)
+        .setScrollFactor(0)
+        .setDepth(1002);
 
-	 this.btnRestart
-		.setInteractive() // Делаем кнопку кликабельной
-		.on('pointerdown', () => this.scene.restart()); // Что делать при клике. В данном случае — перезапустить сцену
+        bg.on('pointerdown', callback);
+        bg.on('pointerover', () => bg.setFillStyle(0x666666));
+        bg.on('pointerout', () => bg.setFillStyle(0x444444));
 
-	this.popup.setScrollFactor(0);
-    this.popup.setPosition(this.scale.width / 2, game.config.height / 2);
+        return [bg, txt];
+    };
 
+    // 3. Создаем кнопки, привязанные к центру экрана
+    const [btnRegBg, btnRegText] = createMenuButton(this, centerX, centerY + 10, 200, 42, 'Регистрация', () => {
+        localStorage.setItem("score", this.score);
+        window.location.href = '/register/';
+    });
 
-	this.popup.setVisible(false) // Скрываем окно
+    const [btnLoginBg, btnLoginText] = createMenuButton(this, centerX, centerY + 65, 200, 42, 'Вход', () => {
+        console.log('Кнопка вход отработала');
+        localStorage.setItem("score", this.score);
+        window.location.href = '/login/';
+    });
+
+    const [btnRestBg, btnRestText] = createMenuButton(this, centerX, centerY + 120, 200, 42, 'Заново', () => {
+        this.scene.restart();
+    });
+
+    // Сохраняем группу всех элементов попапа для удобного показа/скрытия
+    this.popupElements = [
+        this.popupBg,
+        this.popupText,
+        btnRegBg, btnRegText,
+        btnLoginBg, btnLoginText,
+        btnRestBg, btnRestText
+    ];
+
+    // Функция для переключения видимости
+    this.setPopupVisible = (visible) => {
+        this.popupElements.forEach(el => el.setVisible(visible));
+    };
+
+    // Скрываем окно на старте
+    this.setPopupVisible(false);
 
 }
 
 function update () {
-	// Проверка какая клавиша нажата
-	/*if (this.cursors.left.isDown) {
-		console.log('Нажата стрелка ВЛЕВО');
-	}
-	if (this.cursors.right.isDown) {
-		console.log('Нажата стрелка ВПРАВО');
-	}
-	if (this.cursors.up.isDown) {
-		console.log('Нажата стрелка ВВЕРХ');
-	}
-	if (this.cursors.down.isDown) {
-		console.log('Нажата стрелка ВНИЗ');
-	}*/
 
 	// В update():
 	this.background.tilePositionX = this.cameras.main.scrollX * 0.3; // эффект параллакса
@@ -237,7 +238,7 @@ function update () {
 	if (this.player.x >= 11000) {
 		this.physics.pause();
 		//this.popup.setPosition(this.cameras.main.scrollX + this.scale.width / 2, game.config.height / 2);
-		this.popup.setVisible(true);
+		this.setPopupVisible(true);
 	}
 
 }
