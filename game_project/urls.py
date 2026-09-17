@@ -24,7 +24,7 @@ from django.contrib.auth import views as auth_views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
-    path('register', registration, name='register'),
+    path('register/', registration, name='register'),
     path('', game_view, name='game'), # Когда пользователь заходит на главную страницу (/), покажи ему game_view, а значит — нашу игру
     path('login/', custom_login, name='login'),
     path('', home, name = 'home'),
