@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-w0a&=00ec-bj&u+)275^33*n+j&wwhpow3(ye%u$*o!k6(kkmt'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 AUTH_USER_MODEL = 'battle.CustomUser'
 
@@ -52,6 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -90,7 +91,7 @@ DATABASES = {
         'USER': config('DB_USER'),       # имя пользователя PostgreSQL (по умолчанию — postgres)
         'PASSWORD': config('DB_PASSWORD'), # тот самый пароль, который вы задавали при установке
         'HOST': config('DB_HOST'),      # сервер базы данных (обычно localhost)
-        'PORT': config('5432'),           # порт PostgreSQL (по умолчанию 5432)
+        'PORT': config('DB_PORT'),           # порт PostgreSQL (по умолчанию 5432)
     }
 }
 
@@ -133,7 +134,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / "battle" / "staticfiles",
 ]
-STATIC_ROOT = BASE_DIR / "static_collected"
+STATIC_ROOT = BASE_DIR / "staticfiles_prod"
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration

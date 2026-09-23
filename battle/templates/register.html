@@ -1,3 +1,4 @@
+{%  load static %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -9,7 +10,7 @@
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Зарегистрироваться</button>
+    <button class="btn-glass">Зарегистрироваться</button>
   </form>
   <script>
     const score = localStorage.getItem("score");
