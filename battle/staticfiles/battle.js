@@ -1,7 +1,7 @@
 const config = {
 	type: Phaser.AUTO, width: window.innerWidth, height: 768, physics: {
 		default: 'arcade', arcade: {
-			gravity: {y: 500}, debug: true
+			gravity: {y: 500}, debug: false
 		}
 	}, scene: {
 		preload: preload, create: create, update: update
