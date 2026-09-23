@@ -1,0 +1,13 @@
+YAML
+stages:
+  - deploy
+
+deploy_railway:
+  stage: deploy
+  image: ubuntu:latest
+  script:
+    - apt-get update && apt-get install -y curl
+    - curl -fsSL https://railway.app/install.sh | sh
+    - railway up --service=$RAILWAY_renewed_growth --detach
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
