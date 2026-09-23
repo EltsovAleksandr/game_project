@@ -1,1 +1,1 @@
-web: gunicorn battle.wsgi
+web: gunicorn game_project.wsgi
